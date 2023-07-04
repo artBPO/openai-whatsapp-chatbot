@@ -86,7 +86,7 @@ docker build -t openai-ws-chatbot .
 
 #running the container
 #It is expected that you have all the required environmental variables in a .env file
-docker run -p 5000:5000 openai-ws-chatbot --env_file=.env
+docker run -p 5000:5000 --env-file=.env openai-ws-chatbot
 ```
 
 Usage
