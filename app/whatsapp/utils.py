@@ -56,7 +56,7 @@ def ensure_image_generation(reply: str, chat: OpenAIChatManager, sender: Sender,
         r"\[img:\"(.*)\"\]", reply, flags=re.IGNORECASE
     ).group(1)
     reply = re.sub(r"\[img:\"(.*)\"\]", "", reply, flags=re.IGNORECASE)
-    logger.info(f"Image generation prompt: '{img_generation_prompt}'")
+    print(f"Image generation prompt: '{img_generation_prompt}'")
     # send the image in a separate thread
     send_image_with_threading(img_generation_prompt, chat, sender, twilio_client)
     # add to the number of images generated
@@ -117,16 +117,16 @@ def send_image(
     caption: str = None,
 ):
     """Send a generated image to the given phone number via WhatsApp"""
-    logger.info(f"Generating image for prompt: {prompt}")
+    print(f"Generating image for prompt: {prompt}")
     img_url = generate_image(prompt)
-    logger.info(f"Image generated: {img_url}")
-    logger.info(f'"whatsapp:{to_phone}" ' + f'"whatsapp:{from_phone}" ' + img_url)
+    print(f"Image generated: {img_url}")
+    print(f'"whatsapp:{to_phone}" ' + f'"whatsapp:{from_phone}" ' + img_url)
     message = twilio_client.messages.create(
         from_=f"whatsapp:{from_phone}", 
         to=to_phone, 
         media_url=img_url,
         body=caption)
-    logger.info(f"Image sent: {message.sid}")
+    print(f"Image sent: {message.sid}")
 
 
 def save_to_contactbook(reqvals):

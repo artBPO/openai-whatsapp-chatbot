@@ -1,4 +1,5 @@
-import os, logging
+import os
+import logging
 from datetime import datetime
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, request, jsonify
@@ -20,7 +21,7 @@ from app.whatsapp.chat import Sender, OpenAIChatManager
 # from chat.handlers.image import image_captioning
 
 # Load environment variables and configurations for the app
-load_dotenv(find_dotenv())
+load_dotenv('my.env')
 logging.basicConfig()
 logger = logging.getLogger("WP-APP")
 logger.setLevel(logging.DEBUG)
@@ -62,7 +63,7 @@ app = Flask(__name__)
 
 @app.route("/whatsapp/reply", methods=["POST"])
 async def reply_to_whatsapp_message():
-    logger.info(f"Obtained request: {dict(request.values)}")
+    print(f"Obtained request: {dict(request.values)}")
     # create the chat manager
     sender = Sender(
         phone_number=request.values.get("From"),
@@ -80,13 +81,13 @@ async def reply_to_whatsapp_message():
     if message_empty_or_goodbye(msg, chat):
         return jsonify({"status": "ok"})
     # if this is the first message, ensure the language is set
-    logger.info("Chat has %d messages", len(chat.messages))
+    print("Chat has %d messages", len(chat.messages))
     if len(chat.messages) == 1:
         await ensure_user_language(chat, text=msg)
     # generate the reply
     chat.add_message(msg, role="user")
     reply = chatgpt_completion(chat.messages, **model_options).strip()
-    logger.info(f"Generated reply of length {len(reply)}")
+    print(f"Generated reply of length {len(reply)}")
     # check if the reply is requesting an image generation
     reply, img_prompt = verify_image_generation(reply)
     # send the reply
@@ -103,10 +104,11 @@ async def reply_to_whatsapp_message():
         await check_and_send_image_generation(img_prompt, chat, client=chat_client)
     # save the chat
     chat.save()
-    logger.info(
+    print(
         f"--------------\nConversation:\n{chat.get_conversation()}\n----------------"
     )
     return jsonify({"status": "ok"})
+
 
 def message_empty_or_goodbye(msg, chat):
     if check_message_empty(msg, chat):
@@ -122,6 +124,7 @@ def message_empty_or_goodbye(msg, chat):
         return True
     return False
 
+
 def check_message_empty(msg, chat):
     if msg is None or msg.strip() == "":
         # if the message is empty, send a default response
@@ -131,5 +134,5 @@ def check_message_empty(msg, chat):
 
 @app.route("/whatsapp/status", methods=["POST"])
 def process_whatsapp_status():
-    logger.info(f"Obtained request: {dict(request.values)}")
+    print(f"Obtained request: {dict(request.values)}")
     return jsonify({"status": "ok"})

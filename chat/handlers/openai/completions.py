@@ -1,11 +1,19 @@
 """
 Handlers for OpenAI's Completion and Chat Completion APIs
 """
-import logging, re
+import logging
+import re
 from typing import List
 
 import openai
 from chat.clients import ChatClient
+from dotenv import load_dotenv
+import os
+# leemos desde el archivo my.env
+
+load_dotenv('my.env')
+api_key = os.environ.get('OPENAI_API_KEY')
+openai.api_key = api_key
 
 __all__ = [
     "text_completion",
@@ -14,6 +22,7 @@ __all__ = [
     "whisper_voice_transcription",
     "dalle_text_to_image",
 ]
+
 
 def text_completion(
     prompt: str,
@@ -49,7 +58,8 @@ def text_completion(
         engine=engine,
         **kwargs
     )
-    return response.get("choices",[{}])[0].get("text")
+    return response.get("choices", [{}])[0].get("text")
+
 
 def chat_completion(
     messages: List[dict],
@@ -80,7 +90,7 @@ def chat_completion(
         **kwargs
     )
 
-    return response.get("choices",[{}])[0].get("message", {}).get("content")
+    return response.get("choices", [{}])[0].get("message", {}).get("content")
 
 
 def text_translation(
@@ -115,12 +125,12 @@ def text_translation(
         English to French translation.
     **kwargs
         Additional keyword arguments to pass to the Completion API.
-    
+
     Returns
     -------
     str
         The translated text.
-    
+
     Usage
     -----
     >>> translate_text("Hello world", to="french")
@@ -151,8 +161,10 @@ def text_translation(
         result_text = text_completion(prompt, engine=engine, **kwargs)
     return re.sub(r" ->.*", "", result_text).strip()
 
+
 async def atext_translation(*args, **kwargs):
     return text_translation(*args, **kwargs)
+
 
 def language_detection(
     text: str,
@@ -210,8 +222,10 @@ def language_detection(
         detected_lang = detected_lang.split()[0]
     return detected_lang
 
+
 async def alanguage_detection(*args, **kwargs):
     return language_detection(*args, **kwargs)
+
 
 def code_generation(
     prompt: str,
@@ -228,4 +242,4 @@ def code_generation(
         engine=engine,
         **kwargs
     )
-    return response.get("choices",[{}])[0].get("text")
+    return response.get("choices", [{}])[0].get("text")

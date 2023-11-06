@@ -43,7 +43,7 @@ def transcribe_audio(media_url, *, chat=None, language_detection:bool=True, lang
     if language_code is not None:
         data['language_code'] = supported_language_codes.get(language_code, 'en')
         data['language_detection'] = False
-    logger.info(f"Attempting to transcribe audio with {data=}")
+    print(f"Attempting to transcribe audio with {data=}")
     response = requests.post(endpoint, json=data, headers=headers)
     response.raise_for_status()
     transcription_id = response.json()['id']
@@ -57,8 +57,8 @@ def transcribe_audio(media_url, *, chat=None, language_detection:bool=True, lang
         return None
 
     transcription_res.pop('words', None)
-    logger.info(f"Transcription took {time.time() - now:.2f} seconds")
-    logger.info(f"Transcription data:\n{transcription_res}")
+    print(f"Transcription took {time.time() - now:.2f} seconds")
+    print(f"Transcription data:\n{transcription_res}")
     if as_json:
         return transcription_res
     return transcription_res['text']
